@@ -1,0 +1,985 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=PT+Mono&family=PT+Sans:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--red:#c0392b;--red-d:#922b21;--gold:#c8960a;--gold-l:#e8b020;
+--green:#1a7a3a;--green-l:#27ae60;--purple:#6c3a9e;--blue:#1a5fa8;
+--teal:#1a8a8a;
+--paper:#f4efe6;--paper2:#ede5d8;--paper3:#e0d5c4;
+--ink:#1a1a1a;--ink2:#4a4a4a;--ink3:#8a8a8a;
+}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes achpop{0%{opacity:0;transform:translateY(8px) scale(0.95)}10%{opacity:1;transform:translateY(0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translateY(-4px)}}
+#g{font-family:'PT Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:700px;position:relative;overflow:hidden}
+#g::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(0,0,0,0.025) 23px,rgba(0,0,0,0.025) 24px);pointer-events:none;z-index:0}
+.hbar{background:var(--red);padding:9px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10;border-bottom:3px solid var(--red-d)}
+.htitle{font-family:'Russo One',sans-serif;font-size:14px;color:white;letter-spacing:1px}
+.hsub{font-size:9px;color:rgba(255,255,255,0.65);letter-spacing:2px;font-family:'PT Mono',monospace;margin-top:1px}
+.qbadge{background:var(--gold);color:var(--ink);font-family:'PT Mono',monospace;font-size:11px;font-weight:700;padding:3px 10px;border-radius:2px;text-align:right}
+.qlvl{font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px;font-family:'PT Mono',monospace;text-align:right}
+.ticker-wrap{background:var(--red-d);padding:3px 0;overflow:hidden;position:relative;z-index:9;border-bottom:1px solid rgba(0,0,0,0.2)}
+.ticker-inner{display:inline-block;white-space:nowrap;font-family:'PT Mono',monospace;font-size:9px;color:rgba(255,255,255,0.75);letter-spacing:1px;animation:ticker 40s linear infinite}
+.mc{padding:12px 16px;position:relative;z-index:1}
+.srow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px}
+.sc{background:white;border:1px solid var(--paper3);border-radius:3px;padding:7px 9px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.sc.mo::after{background:var(--green)}.sc.ri::after{background:var(--red)}.sc.ra::after{background:var(--gold)}.sc.po::after{background:var(--purple)}.sc.co::after{background:var(--teal)}.sc.lo::after{background:var(--blue)}
+.slbl{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;font-family:'PT Mono',monospace;margin-bottom:3px}
+.sval{font-family:'Russo One',sans-serif;font-size:14px}
+.sval.gr{color:var(--green)}.sval.rd{color:var(--red)}.sval.go{color:var(--gold)}.sval.pu{color:var(--purple)}.sval.te{color:var(--teal)}.sval.bl{color:var(--blue)}
+.mbar{margin-top:3px;height:3px;background:var(--paper2);border-radius:2px;overflow:hidden}
+.mbf{height:100%;border-radius:2px;transition:width 0.4s ease}
+.season-bar{background:white;border:1px solid var(--paper3);border-radius:3px;padding:5px 11px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--paper3);flex-wrap:wrap}
+.tab{padding:7px 12px;font-family:'PT Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;color:var(--ink3);background:none;border:none;border-bottom:2px solid transparent;transition:all 0.15s}
+.tab.active{color:var(--red);border-bottom-color:var(--red)}
+.tab:hover{color:var(--ink)}
+.panel{display:none}.panel.active{display:block}
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.dblk{background:white;border:1px solid var(--paper3);border-radius:3px;padding:11px;position:relative}
+.dtit{font-family:'PT Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink3);margin-bottom:9px;border-bottom:1px dashed var(--paper3);padding-bottom:5px}
+.cbtn{background:var(--paper);border:1px solid var(--paper3);border-radius:2px;padding:6px 9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;transition:all 0.12s;text-align:left;width:100%}
+.cbtn:hover{background:var(--paper2);border-color:var(--red)}
+.cbtn.sel{background:rgba(192,57,43,0.07);border-color:var(--red)}
+.cname{font-size:11px;font-weight:700;color:var(--ink)}
+.cinfo{font-size:9px;color:var(--ink3);margin-top:1px}
+.crisk{font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3)}
+.slg{margin-bottom:8px}
+.sll{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px}
+.slln{color:var(--ink3);font-family:'PT Mono',monospace;font-size:9px}
+.sllv{font-weight:700;font-family:'PT Mono',monospace;font-size:10px;color:var(--red)}
+input[type=range]{width:100%;accent-color:var(--red);cursor:pointer}
+.calc-box{margin-top:8px;padding:7px 9px;background:var(--paper);border-radius:2px;border:1px dashed var(--paper3)}
+.calc-big{font-family:'Russo One',sans-serif;font-size:18px;color:var(--green)}
+.calc-sub{font-family:'PT Mono',monospace;font-size:9px;color:var(--red);margin-top:2px}
+.arow{display:flex;gap:7px;margin-bottom:12px}
+.bmain{flex:1;background:var(--red);color:white;border:none;border-radius:2px;padding:9px 14px;font-family:'Russo One',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:background 0.15s;text-transform:uppercase}
+.bmain:hover{background:var(--red-d)}.bmain:disabled{background:#aaa;cursor:not-allowed}
+.bsec{background:white;color:var(--ink);border:1px solid var(--paper3);border-radius:2px;padding:9px 12px;font-family:'PT Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;text-transform:uppercase;letter-spacing:1px}
+.bsec:hover{border-color:var(--red);color:var(--red)}
+.lsec{background:white;border:1px solid var(--paper3);border-radius:3px;padding:9px 11px}
+.ltit{font-family:'PT Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink3);margin-bottom:7px}
+.le{font-family:'PT Mono',monospace;font-size:10px;color:var(--ink3);padding:2px 0;border-bottom:1px dotted var(--paper3);display:flex;gap:7px}
+.le:last-child{border-bottom:none}
+.lets{color:var(--paper3);flex-shrink:0}
+.le.dn{color:var(--red)}.le.ok{color:var(--green)}.le.wn{color:var(--gold)}
+.eov{position:absolute;inset:0;background:rgba(20,16,12,0.88);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.eov.show{opacity:1;pointer-events:all}
+.ecard{background:var(--paper);border:2px solid var(--red);border-radius:4px;padding:20px;max-width:360px;width:92%;position:relative}
+.estmp{font-family:'Russo One',sans-serif;font-size:8px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.etit{font-family:'Russo One',sans-serif;font-size:17px;color:var(--ink);margin-bottom:7px;line-height:1.2}
+.edesc{font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:14px}
+.ech{background:white;border:1px solid var(--paper3);border-radius:2px;padding:7px 10px;font-size:11px;cursor:pointer;text-align:left;transition:all 0.12s;display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;width:100%}
+.ech:hover{border-color:var(--red);background:rgba(192,57,43,0.05)}
+.ceff{font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3)}
+.shopitem{background:var(--paper);border:1px solid var(--paper3);border-radius:3px;padding:9px;cursor:pointer;transition:all 0.12s;text-align:left;width:100%}
+.shopitem:hover{border-color:var(--gold);background:rgba(200,150,10,0.05)}
+.shopitem.owned{border-color:var(--green);background:rgba(26,122,58,0.05);cursor:default}
+.shopitem.cantaff{opacity:0.45;cursor:not-allowed}
+.shn{font-size:11px;font-weight:700;color:var(--ink)}
+.shp{font-family:'Russo One',sans-serif;font-size:13px;color:var(--gold);margin-top:2px}
+.shb{font-size:9px;color:var(--ink3);margin-top:2px}
+.owned-badge{font-size:9px;color:var(--green);font-family:'PT Mono',monospace;font-weight:700}
+.defbtn{background:white;border:1px solid var(--paper3);border-radius:2px;padding:7px 10px;font-size:11px;cursor:pointer;text-align:left;transition:all 0.12s;width:100%;margin-bottom:5px;display:flex;justify-content:space-between}
+.defbtn:hover{border-color:var(--blue);background:rgba(26,95,168,0.05)}
+.defcost{font-family:'PT Mono',monospace;font-size:10px;color:var(--blue)}
+.contact-card{background:white;border:1px solid var(--paper3);border-radius:3px;padding:10px}
+.contact-card.owned{border-color:var(--teal);background:rgba(26,138,138,0.04)}
+.ach-toast-wrap{position:fixed;bottom:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.ach-toast{background:var(--paper);border:2px solid var(--gold);border-radius:3px;padding:8px 12px;font-family:'PT Mono',monospace;font-size:10px;animation:achpop 3.2s ease forwards;box-shadow:0 2px 12px rgba(0,0,0,0.18)}
+.dstat-row{display:flex;justify-content:space-between;font-size:10px;font-family:'PT Mono',monospace;padding:3px 0;border-bottom:1px dotted var(--paper3)}
+.dstat-row:last-child{border-bottom:none}
+</style>
+
+<div id="g">
+<div class="hbar">
+  <div>
+    <div class="htitle">ПИЛОРАМА 2.0: РАСПИЛ БЕЗ ГРАНИЦ</div>
+    <div class="hsub">СИМУЛЯТОР ЭФФЕКТИВНОГО МЕНЕДЖЕРА &nbsp;·&nbsp; <span style="color:var(--gold-l)">★ DLC: ВЕРТИКАЛЬ ВЛАСТИ ★</span></div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:flex-end">
+    <div style="text-align:right">
+      <div style="font-size:9px;color:rgba(255,255,255,0.5);font-family:'PT Mono',monospace">НАСТРОЕНИЕ</div>
+      <div style="font-size:10px;color:white;font-family:'PT Mono',monospace" id="mood-val">😐 Нейтрально</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:9px;color:rgba(255,255,255,0.5);font-family:'PT Mono',monospace">♪</span>
+      <input type="range" min="0" max="100" value="25" step="5" style="width:64px;accent-color:var(--gold);cursor:pointer" oninput="bgAudio.volume=this.value/100" title="Громкость музыки">
+    </div>
+    <div><div class="qbadge" id="qb">КВ.1 / 2024</div><div class="qlvl" id="lvln">МУНИЦИПАЛИТЕТ</div></div>
+  </div>
+</div>
+
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker">◆ СРОЧНО: Минфин одобрил новый транш ◆ Губернатор вернулся из Дубая «по рабочим вопросам» ◆ Тендер на «умные скамейки» признан законным ◆ Открыт перекрёсток ценой ₽180 млн ◆ Счётная палата нарушений не нашла ◆ Новый подрядчик прошёл конкурс с первого раза ◆ Инфляция составила «около нуля» ◆ Депутат задержан «в профилактических целях» ◆ Главный архитектор подарил жене квартиру «за красоту города» ◆ Мост сдан досрочно — асфальт уложен поверх снега ◆ &nbsp;&nbsp;&nbsp; ◆ СРОЧНО: Минфин одобрил новый транш ◆ Губернатор вернулся из Дубая «по рабочим вопросам» ◆ Тендер на «умные скамейки» признан законным ◆ Открыт перекрёсток ценой ₽180 млн ◆ Счётная палата нарушений не нашла ◆ Новый подрядчик прошёл конкурс с первого раза ◆ Инфляция составила «около нуля» ◆ Депутат задержан «в профилактических целях» ◆ Главный архитектор подарил жене квартиру «за красоту города» ◆ Мост сдан досрочно — асфальт уложен поверх снега ◆</div>
+</div>
+
+<div class="mc">
+  <div class="srow">
+    <div class="sc mo"><div class="slbl">Счёт</div><div class="sval gr" id="s-wallet">₽0</div><div class="mbar"><div class="mbf" id="b-wallet" style="background:var(--green);width:0%"></div></div></div>
+    <div class="sc ri"><div class="slbl">Внимание ФСБ</div><div class="sval rd" id="s-risk">0%</div><div class="mbar"><div class="mbf" id="b-risk" style="background:var(--red);width:0%"></div></div></div>
+    <div class="sc ra"><div class="slbl">Рейтинг шефа</div><div class="sval go" id="s-rate">50%</div><div class="mbar"><div class="mbf" id="b-rate" style="background:var(--gold);width:50%"></div></div></div>
+    <div class="sc po"><div class="slbl">Народное доверие</div><div class="sval pu" id="s-pop">50%</div><div class="mbar"><div class="mbf" id="b-pop" style="background:var(--purple);width:50%"></div></div></div>
+    <div class="sc co"><div class="slbl">Связи</div><div class="sval te" id="s-conn">0</div><div class="mbar"><div class="mbf" id="b-conn" style="background:var(--teal);width:0%"></div></div></div>
+    <div class="sc lo"><div class="slbl">Уровень / XP</div><div class="sval bl" id="s-lvl">Районный</div><div style="font-size:9px;color:var(--ink3);font-family:'PT Mono',monospace;margin-top:2px" id="s-xp">XP: 0/100</div></div>
+  </div>
+
+  <div class="season-bar">
+    <div style="font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px">Сезон: <span id="season-name" style="color:var(--ink)">Зима — Тихо пока</span></div>
+    <div style="font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3)">Ачивки: <span id="ach-count" style="color:var(--blue);font-weight:700">0</span>/10 &nbsp;·&nbsp; <span id="combo-lbl" style="color:var(--gold)"></span></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('work',this)">Работа</button>
+    <button class="tab" onclick="switchTab('defense',this)">Защита</button>
+    <button class="tab" onclick="switchTab('shop',this)">Активы</button>
+    <button class="tab" onclick="switchTab('perks',this)">Таланты</button>
+    <button class="tab" onclick="switchTab('contacts',this)">Связи</button>
+    <button class="tab" onclick="switchTab('dossier',this)">Досье</button>
+  </div>
+
+  <div id="tab-work" class="panel active">
+    <div class="dg2" style="margin-bottom:10px">
+      <div class="dblk">
+        <div class="dtit">Бюджет квартала</div>
+        <div style="font-family:'Russo One',sans-serif;font-size:20px;color:var(--green)" id="budgetdisp">₽50 млн</div>
+        <div style="font-size:10px;color:var(--ink3);font-family:'PT Mono',monospace;margin-bottom:10px" id="budgetnm">нацпроект "Дороги"</div>
+        <div class="slg">
+          <div class="sll"><span class="slln">ОТКАТ СЕБЕ</span><span class="sllv" id="vkb">20%</span></div>
+          <input type="range" min="5" max="70" value="20" step="5" id="sl-kb" oninput="updCalc()">
+          <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--ink3);font-family:'PT Mono',monospace;margin-top:2px"><span>Скромно</span><span>Наглость</span></div>
+        </div>
+        <div class="slg">
+          <div class="sll"><span class="slln">НА СОЦИАЛКУ</span><span class="sllv" id="vsoc">10%</span></div>
+          <input type="range" min="0" max="30" value="10" step="5" id="sl-soc" oninput="updCalc()">
+          <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--ink3);font-family:'PT Mono',monospace;margin-top:2px"><span>Народ злится</span><span>Стабильность</span></div>
+        </div>
+        <div class="calc-box">
+          <div style="font-size:9px;color:var(--ink3);font-family:'PT Mono',monospace">Итого в карман:</div>
+          <div class="calc-big" id="takehome">₽10 млн</div>
+          <div class="calc-sub" id="riskwarn">+12% к риску · народ -5</div>
+        </div>
+      </div>
+      <div class="dblk">
+        <div class="dtit">Выбор подрядчика</div>
+        <div id="clist"></div>
+        <div style="font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);margin-top:6px;text-align:center" id="qhint">Выберите подрядчика</div>
+      </div>
+    </div>
+    <div class="arow">
+      <button class="bmain" id="apprbtn" onclick="approveProject()">Подписать смету</button>
+      <button class="bsec" onclick="switchTab('defense',this)">Защита ›</button>
+      <button class="bsec" onclick="switchTab('shop',this)">Активы ›</button>
+    </div>
+  </div>
+
+  <div id="tab-defense" class="panel">
+    <div class="dg2" style="margin-bottom:10px">
+      <div class="dblk">
+        <div class="dtit">Снизить подозрение ФСБ</div>
+        <div id="def-fsb-list"></div>
+      </div>
+      <div class="dblk">
+        <div class="dtit">Поднять народное доверие</div>
+        <div id="def-pop-list"></div>
+      </div>
+    </div>
+    <div class="dblk" style="margin-bottom:10px">
+      <div class="dtit">Поднять рейтинг у шефа</div>
+      <div id="def-boss-list"></div>
+    </div>
+    <div style="font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);text-align:center;padding:4px 0">Все действия тратят деньги из кармана. Выбирай мудро.</div>
+  </div>
+
+  <div id="tab-shop" class="panel">
+    <div style="margin-bottom:8px;font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase">Активы и роскошь — снижают подозрение, поднимают статус</div>
+    <div class="dg3" id="shopgrid"></div>
+  </div>
+
+  <div id="tab-perks" class="panel">
+    <div style="margin-bottom:8px;font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase">Таланты — открываются за XP при повышении уровня</div>
+    <div class="dg2" id="perkgrid"></div>
+  </div>
+
+  <div id="tab-contacts" class="panel">
+    <div style="margin-bottom:8px;font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase">Полезные люди — каждый даёт уникальный пассивный бонус. Тратятся деньги и Связи.</div>
+    <div class="dg2" id="contact-grid"></div>
+  </div>
+
+  <div id="tab-dossier" class="panel">
+    <div class="dg2" style="margin-bottom:10px">
+      <div class="dblk">
+        <div class="dtit">Личное досье</div>
+        <div id="dossier-stats"></div>
+      </div>
+      <div class="dblk">
+        <div class="dtit">Достижения</div>
+        <div id="ach-list"></div>
+      </div>
+    </div>
+    <div class="dblk">
+      <div class="dtit">Криминальная хроника</div>
+      <div id="crime-log" style="font-family:'PT Mono',monospace;font-size:9px;color:var(--ink3)">Пока чист. Пока.</div>
+    </div>
+  </div>
+
+  <div class="lsec" style="margin-top:10px">
+    <div class="ltit">Журнал деятельности</div>
+    <div id="logc"><div class="le"><span class="lets">--:--</span><span>Добро пожаловать. Вы назначены главой района.</span></div></div>
+  </div>
+</div>
+
+<div class="eov" id="eov">
+  <div class="ecard">
+    <div class="estmp" id="ev-st">ВХОДЯЩИЙ ДОКУМЕНТ</div>
+    <div class="etit" id="ev-ti">Событие</div>
+    <div class="edesc" id="ev-de"></div>
+    <div id="ev-ch"></div>
+  </div>
+</div>
+</div>
+
+<div class="ach-toast-wrap" id="ach-toast-wrap"></div>
+
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+const G = {
+  wallet:0, risk:0, rating:50, pop:50, xp:0,
+  quarter:1, year:2024, level:0,
+  connections:0, combo:0, mood:50, season:0,
+  totalTaken:0, quartersSurvived:0,
+  assets:[], activePerks:[], crimeLog:[], unlockedContacts:[],
+  budgets:[50,90,150,280],
+  budgetNames:['нацпроект "Дороги"','программу "Жильё"','нацпроект "Экология"','мегапроект "ЦифроРоссия"'],
+  levels:['Районный','Областной','Федеральный','Госкорп'],
+  levelNames:['МУНИЦИПАЛИТЕТ','РЕГИОН','МИНИСТЕРСТВО','ГОСКОРПОРАЦИЯ'],
+  xpNeeds:[100,300,700,9999],
+};
+
+let selC = null, logT = 0, importBonus = 0;
+const usedContractors = new Set();
+
+// ============================================================
+// DATA
+// ============================================================
+const CONTRACTORS = [
+  {name:'ООО "Ромашка Строй"', sub:'племянник · однодневка', risk:8, qual:25},
+  {name:'АО "РосСтройТех"',    sub:'сват · проверенные',     risk:13,qual:52},
+  {name:'ООО "Лидер Плюс"',   sub:'друг · надёжные',        risk:6, qual:47},
+  {name:'ЗАО "ПримаСтрой"',   sub:'компания жены',           risk:18,qual:70},
+  {name:'МУП "ГорСтрой"',     sub:'гос. контора · медленно', risk:3, qual:80},
+];
+
+const DEFENSE_FSB = [
+  {name:'Нанять юриста-прокладку',      cost:3, eff:'риск -15%', fn:()=>{G.risk=Math.max(0,G.risk-15)}},
+  {name:'Перевести активы на маму',      cost:5, eff:'риск -20%', fn:()=>{G.risk=Math.max(0,G.risk-20)}},
+  {name:'Задокументировать "легенду"',  cost:2, eff:'риск -10%', fn:()=>{G.risk=Math.max(0,G.risk-10)}},
+  {name:'Купить молчание свидетелей',   cost:8, eff:'риск -30%', fn:()=>{G.risk=Math.max(0,G.risk-30)}},
+  {name:'Уничтожить часть документов',  cost:1, eff:'риск -8%, рейтинг -5', fn:()=>{G.risk=Math.max(0,G.risk-8);G.rating=Math.max(0,G.rating-5)}},
+];
+const DEFENSE_POP = [
+  {name:'Ролик "Я строю для людей"',    cost:2, eff:'народ +15', fn:()=>{G.pop=Math.min(100,G.pop+15)}},
+  {name:'Подарки ветеранам',            cost:3, eff:'народ +20, рейтинг +5', fn:()=>{G.pop=Math.min(100,G.pop+20);G.rating=Math.min(100,G.rating+5)}},
+  {name:'Детский праздник на площади',  cost:1, eff:'народ +10', fn:()=>{G.pop=Math.min(100,G.pop+10)}},
+  {name:'Открыть поликлинику (чужую)',  cost:4, eff:'народ +25, рейтинг +8', fn:()=>{G.pop=Math.min(100,G.pop+25);G.rating=Math.min(100,G.rating+8)}},
+];
+const DEFENSE_BOSS = [
+  {name:'Сувенир из командировки',      cost:2, eff:'рейтинг +10', fn:()=>{G.rating=Math.min(100,G.rating+10)}},
+  {name:'Организовать охоту для шефа',  cost:6, eff:'рейтинг +20', fn:()=>{G.rating=Math.min(100,G.rating+20)}},
+  {name:'Отчёт "о достижениях"',        cost:1, eff:'рейтинг +7',  fn:()=>{G.rating=Math.min(100,G.rating+7)}},
+  {name:'Поддержать нужный законопроект',cost:0,eff:'рейтинг +12, народ -8', fn:()=>{G.rating=Math.min(100,G.rating+12);G.pop=Math.max(0,G.pop-8)}},
+];
+
+const ASSETS = [
+  {id:'apt',   name:'Квартира в Москве',              price:15,  icon:'APT', bonus:'риск -5% пассивно',          eff:()=>{},                          passive:{risk:-5}},
+  {id:'bmw',   name:'BMW X7 (оформлен на тёщу)',       price:8,   icon:'BMW', bonus:'рейтинг шефа +8',            eff:()=>{G.rating=Math.min(100,G.rating+8)}, passive:{}},
+  {id:'dacha', name:'Дача в Подмосковье',              price:25,  icon:'DCH', bonus:'народ -3, риск -8 пассивно', eff:()=>{G.pop=Math.max(0,G.pop-3)}, passive:{risk:-8}},
+  {id:'tur',   name:'Вилла в ОАЭ (кипрский офшор)',   price:60,  icon:'AED', bonus:'XP +50, риск -15 пассивно',  eff:()=>{G.xp+=50},                  passive:{risk:-15}},
+  {id:'watch', name:'Часы Breguet за ₽4 млн',         price:4,   icon:'WCH', bonus:'рейтинг +5',                 eff:()=>{G.rating=Math.min(100,G.rating+5)}, passive:{}},
+  {id:'krysha',name:'Крыша из ФСБ (ежеквартально)',   price:12,  icon:'FSB', bonus:'риск от событий -40%',       eff:()=>{},                          passive:{riskMult:0.6}},
+  {id:'media', name:'Купить районную газету',          price:10,  icon:'GZT', bonus:'народ +5 каждый ход',        eff:()=>{},                          passive:{popPerQ:5}},
+  {id:'crypto',name:'Крипто-кошелёк (Дубай)',         price:20,  icon:'BTC', bonus:'вывод средств +15% бонус',   eff:()=>{},                          passive:{walletMult:1.15}},
+  {id:'island',name:'Остров в Индийском океане',       price:200, icon:'ISL', bonus:'ПОБЕДА: эндгейм "Свободен"', eff:()=>{setTimeout(()=>endGame('island'),300)}, passive:{}},
+];
+
+const PERKS = [
+  {id:'p_lawyer',  name:'Мастер отката',        desc:'Риск от откатов -30%',                   lvlReq:0, cost:50,  tag:'risk_reduce'},
+  {id:'p_batya',   name:'Батя в здании',         desc:'Защитные действия на ФСБ дешевле -30%', lvlReq:0, cost:60,  tag:'def_cheap'},
+  {id:'p_digital', name:'Цифровой реформатор',   desc:'Бюджет квартала +20%',                  lvlReq:1, cost:120, tag:'budget_boost'},
+  {id:'p_charisma',name:'Харизматичный популист',desc:'Соц. расходы дают x2 народного доверия',lvlReq:1, cost:100, tag:'pop_boost'},
+  {id:'p_import',  name:'Параллельный импортёр', desc:'+20 млн бонус раз в 2 квартала',        lvlReq:2, cost:200, tag:'import_bonus'},
+  {id:'p_schemy',  name:'Схемы 90-х',            desc:'Лимит откатов поднят до 90%',           lvlReq:2, cost:250, tag:'max_kickback'},
+  {id:'p_godfather',name:'Крёстный отец',        desc:'Случайные опасные события -70%',        lvlReq:3, cost:400, tag:'event_shield'},
+];
+
+// DLC: Contacts
+const CONTACTS = [
+  {id:'notary',    icon:'📋', name:'Нотариус Семёныч',    desc:'Переоформит что угодно на кого угодно', cost:5,  connCost:0,  bonus:'Защитные действия -25% дешевле'},
+  {id:'journalist',icon:'📰', name:'Журналистка Лена',    desc:'Напишет что надо, промолчит когда надо', cost:4,  connCost:3,  bonus:'PR-акции дают +5 народа дополнительно'},
+  {id:'banker',    icon:'🏦', name:'Банкир Аркадий',      desc:'Отмоет через три прокладки',            cost:8,  connCost:5,  bonus:'Каждый откат +10% к сумме бонусом'},
+  {id:'silovik',   icon:'🎖️', name:'Полковник Рогов',     desc:'Свой человек в силовых структурах',     cost:12, connCost:8,  bonus:'События ФСБ дают -40% риска'},
+  {id:'oligarch',  icon:'💎', name:'Олигарх Виктор К.',   desc:'Деловые связи федерального масштаба',   cost:20, connCost:15, bonus:'+15 млн каждые 3 квартала пассивно'},
+  {id:'pop',       icon:'⛪', name:'Поп Фёдор',           desc:'Освящает и стройки, и схемы',           cost:2,  connCost:1,  bonus:'Народ падает на 30% медленнее'},
+  {id:'hacker',    icon:'💻', name:'IT-специалист Жека',  desc:'Удалит всё из интернета. Почти.',       cost:6,  connCost:4,  bonus:'Блогерские события -50% урона'},
+  {id:'doctor',    icon:'🩺', name:'Доктор Хайдер',       desc:'Ставит любые диагнозы, подписывает справки', cost:3, connCost:2, bonus:'Раз за игру отменить последствие события'},
+];
+
+// DLC: Achievements
+const ACHIEVEMENTS = [
+  {id:'first_billion', icon:'💰', name:'Первый миллиард',     desc:'Накопить ₽1 млрд',               check:()=>G.wallet>=1000,                    done:false},
+  {id:'five_perks',    icon:'⭐', name:'Талантливый',         desc:'Открыть 3 таланта',              check:()=>G.activePerks.length>=3,           done:false},
+  {id:'survive_10q',   icon:'🏛️', name:'Опытный чиновник',   desc:'Пережить 10 кварталов',           check:()=>G.quartersSurvived>=10,            done:false},
+  {id:'max_risk',      icon:'🔥', name:'Игрок с огнём',       desc:'Достичь 80% ФСБ и выжить квартал',check:()=>G.risk>=80&&G.risk<85,            done:false},
+  {id:'connected',     icon:'🤝', name:'Свой везде',          desc:'Завербовать 5 контактов',         check:()=>G.unlockedContacts.length>=5,      done:false},
+  {id:'combo3',        icon:'⚡', name:'В потоке',            desc:'Тихие 3 квартала подряд',         check:()=>G.combo>=3,                        done:false},
+  {id:'fed_level',     icon:'🇷🇺', name:'Федеральный человек',desc:'Достичь федерального уровня',     check:()=>G.level>=2,                        done:false},
+  {id:'all_cont',      icon:'🏗️', name:'Не выбирать',        desc:'Поработать с каждым подрядчиком', check:()=>usedContractors.size>=CONTRACTORS.length, done:false},
+  {id:'island_seeker', icon:'🏝️', name:'Мечтатель',          desc:'Купить виллу в ОАЭ',              check:()=>G.assets.includes('tur'),          done:false},
+  {id:'godfather',     icon:'👑', name:'Настоящий хозяин',    desc:'Набрать 10 связей',               check:()=>G.connections>=10,                 done:false},
+];
+
+// DLC: Seasons
+const SEASONS = [
+  {name:'Зима — Тихо пока',         riskMod:-3, popMod:0},
+  {name:'Весна — Сезон отчётов',    riskMod:+6, popMod:+5},
+  {name:'Лето — Отпуска и проверки',riskMod:+2, popMod:+8},
+  {name:'Осень — Бюджет принимают', riskMod:-2, popMod:-4},
+];
+
+const EVENTS = [
+  {st:'КАДРОВЫЕ ИЗМЕНЕНИЯ',ti:'Губернатор сменился!',de:'Новый шеф расставляет своих. Старые договорённости обнулены.',ch:[
+    {t:'Сделать дорогой подарок',e:'рейтинг +20, -6 млн',fn:()=>{G.rating=Math.min(100,G.rating+20);spend(6,'Подарок губернатору')}},
+    {t:'Найти общих знакомых',e:'рейтинг +10, риск +5%',fn:()=>{G.rating=Math.min(100,G.rating+10);G.risk=Math.min(95,G.risk+5)}},
+    {t:'Лечь на дно',e:'рейтинг -15',fn:()=>{G.rating=Math.max(0,G.rating-15)}},
+  ]},
+  {st:'СРОЧНО',ti:'Блогер снял расследование',de:'Ролик набирает 2 млн просмотров. "Умные остановки за 15 млн" уже в Телеграм-каналах.',ch:[
+    {t:'Выкупить и удалить',e:'-4 млн, риск -20%',fn:()=>{spend(4,'Удаление видео');G.risk=Math.max(0,G.risk-(G.unlockedContacts.includes('hacker')?30:20))}},
+    {t:'Запустить опровержение',e:'-1 млн, народ +5, риск -8%',fn:()=>{spend(1,'PR-контратака');G.pop=Math.min(100,G.pop+5+(G.unlockedContacts.includes('journalist')?5:0));G.risk=Math.max(0,G.risk-8)}},
+    {t:'Пригрозить блогеру',e:'риск -5%, народ -10',fn:()=>{G.risk=Math.max(0,G.risk-5);G.pop=Math.max(0,G.pop-10)}},
+    {t:'Игнорировать',e:'риск +18%, народ -12',fn:()=>{G.risk=Math.min(95,G.risk+18);G.pop=Math.max(0,G.pop-12)}},
+  ]},
+  {st:'ПОРУЧЕНИЕ СВЕРХУ',ti:'Путин упомянул твой регион!',de:'Президент лично назвал объект в речи. Нужен реальный результат.',ch:[
+    {t:'Построить честно',e:'рейтинг +30, -50% бюджета',fn:()=>{G.rating=Math.min(100,G.rating+30);G.wallet=Math.max(0,G.wallet-G.budgets[G.level]*0.5);addLog('Объект сдан честно.','wn')}},
+    {t:'Перекрасить старый объект',e:'рейтинг +8, риск +12%',fn:()=>{G.rating=Math.min(100,G.rating+8);G.risk=Math.min(95,G.risk+12)}},
+    {t:'Отчитаться чужим объектом',e:'рейтинг -5, риск -15%',fn:()=>{G.rating=Math.max(0,G.rating-5);G.risk=Math.max(0,G.risk-15)}},
+  ]},
+  {st:'ВЫБОРЫ',ti:'Режим предвыборного турбо',de:'Пришли сверхбюджеты "на благоустройство". Нужно и взять, и показать результат.',ch:[
+    {t:'Распилить всё',e:'+бюджет×40%, риск +22%, народ +5',fn:()=>{G.wallet+=G.budgets[G.level]*0.4;G.risk=Math.min(95,G.risk+22);G.pop=Math.min(100,G.pop+5)}},
+    {t:'Раздать часть пенсионерам',e:'+бюджет×15%, народ +25, рейтинг +10',fn:()=>{G.wallet+=G.budgets[G.level]*0.15;G.pop=Math.min(100,G.pop+25);G.rating=Math.min(100,G.rating+10)}},
+    {t:'Честно направить на нужды',e:'рейтинг +20, народ +15',fn:()=>{G.rating=Math.min(100,G.rating+20);G.pop=Math.min(100,G.pop+15)}},
+  ]},
+  {st:'ГЕОПОЛИТИКА',ti:'Новый пакет санкций',de:'Западные партнёры ввели очередные санкции. Зато появились деньги на "параллельный импорт".',ch:[
+    {t:'Подать заявку на субсидию',e:'+25 млн на счёт',fn:()=>{G.wallet+=25;addLog('Субсидия одобрена.','ok')}},
+    {t:'Переориентироваться на крипту',e:'+12 млн, риск +10%',fn:()=>{G.wallet+=12;G.risk=Math.min(95,G.risk+10)}},
+    {t:'Ничего не делать',e:'Упустить возможность',fn:()=>{addLog('Санкционная возможность упущена.','')}},
+  ]},
+  {st:'СИЛОВЫЕ СТРУКТУРЫ',ti:'ФСБ интересуется вами',de:'Куратор намекнул: кто-то сверху попросил "присмотреться".',ch:[
+    {t:'Заплатить через посредника',e:'-10 млн, риск -25%',fn:()=>{spend(10,'Откуп от ФСБ');G.risk=Math.max(0,G.risk-25)}},
+    {t:'Сдать коллегу',e:'риск -30%, рейтинг -10, народ -5',fn:()=>{G.risk=Math.max(0,G.risk-30);G.rating=Math.max(0,G.rating-10);G.pop=Math.max(0,G.pop-5);addLog('Коллега задержан.','ok')}},
+    {t:'Договориться через знакомых',e:'-5 млн, риск -15%',fn:()=>{spend(5,'Посредник');G.risk=Math.max(0,G.risk-15)}},
+  ]},
+  {st:'НАРОДНОЕ НЕДОВОЛЬСТВО',ti:'Протесты у администрации',de:'Местные вышли с плакатами против "нано-асфальта".',ch:[
+    {t:'Выйти к людям',e:'народ +20, рейтинг +5',fn:()=>{G.pop=Math.min(100,G.pop+20);G.rating=Math.min(100,G.rating+5)}},
+    {t:'Разогнать тихонько',e:'народ -5, риск +8%',fn:()=>{G.pop=Math.max(0,G.pop-5);G.risk=Math.min(95,G.risk+8)}},
+    {t:'Объявить конкурс идей',e:'-2 млн, народ +15',fn:()=>{spend(2,'Конкурс идей');G.pop=Math.min(100,G.pop+15)}},
+  ]},
+  {st:'ПОВЫШЕНИЕ',ti:'Предложение сверху',de:'Из администрации области пришло предложение о переводе.',ch:[
+    {t:'Согласиться (доплатить в фонд)',e:'+1 уровень, -20 млн',fn:()=>{spend(20,'Взнос за повышение');if(G.level<3){G.level++;G.xp=0;addLog('Повышение! Уровень: '+G.levels[G.level],'ok')}}},
+    {t:'Попросить время подумать',e:'Пропустить',fn:()=>{addLog('Предложение снято.','wn')}},
+  ]},
+  {st:'АУДИТ',ti:'Счётная палата нагрянула',de:'Внеплановая проверка смет за последние 3 квартала.',ch:[
+    {t:'Срочно "доработать" документы',e:'-5 млн, риск -20%',fn:()=>{spend(5,'Корректура');G.risk=Math.max(0,G.risk-20)}},
+    {t:'Натравить юристов',e:'-8 млн, риск -15%, рейтинг -5',fn:()=>{spend(8,'Юридическая война');G.risk=Math.max(0,G.risk-15);G.rating=Math.max(0,G.rating-5)}},
+    {t:'Сотрудничать с проверкой',e:'риск +10%, рейтинг +10',fn:()=>{G.risk=Math.min(95,G.risk+10);G.rating=Math.min(100,G.rating+10)}},
+  ]},
+  {st:'БИЗНЕС',ti:'Деловое предложение',de:'Некий олигарх предлагает совместный "бизнес" в серой зоне.',ch:[
+    {t:'Согласиться',e:'+30 млн, риск +15%',fn:()=>{G.wallet+=30;G.risk=Math.min(95,G.risk+15)}},
+    {t:'Отказать вежливо',e:'Ничего',fn:()=>{addLog('Предложение отклонено.','wn')}},
+    {t:'Сообщить конкурентам',e:'рейтинг +8, риск -5%',fn:()=>{G.rating=Math.min(100,G.rating+8);G.risk=Math.max(0,G.risk-5)}},
+  ]},
+  // DLC events
+  {st:'ДЕЛЕГАЦИЯ',ti:'Визит иностранных партнёров',de:'Бизнесмены из "дружественной страны" хотят инвестировать. В ваш район. Очень хотят.',ch:[
+    {t:'Принять, организовать банкет',e:'-3 млн, связи +5, рейтинг +10',fn:()=>{spend(3,'Банкет для партнёров');G.connections+=5;G.rating=Math.min(100,G.rating+10)}},
+    {t:'Отказать — нечего светиться',e:'риск -5%',fn:()=>{G.risk=Math.max(0,G.risk-5);addLog('Делегация уехала ни с чем.','wn')}},
+    {t:'Взять посредника-переводчика',e:'+15 млн, риск +10%',fn:()=>{G.wallet+=15;G.risk=Math.min(95,G.risk+10);addLog('Сделка с иностранцами оформлена.','ok')}},
+  ]},
+  {st:'ЧС',ti:'Мост рухнул',de:'Тот самый мост капитального ремонта 2022 года. Сразу после торжественного открытия.',ch:[
+    {t:'Свалить на субподрядчика',e:'риск -10%, народ -8',fn:()=>{G.risk=Math.max(0,G.risk-10);G.pop=Math.max(0,G.pop-8);addCrime('Мост рухнул — вина переложена на субподрядчика')}},
+    {t:'Выехать лично, обняться с пострадавшими',e:'народ +20, риск +5%',fn:()=>{G.pop=Math.min(100,G.pop+20);G.risk=Math.min(95,G.risk+5)}},
+    {t:'Засекретить происшествие',e:'риск +8%, народ -15',fn:()=>{G.risk=Math.min(95,G.risk+8);G.pop=Math.max(0,G.pop-15);addCrime('Засекреченное ЧС с мостом')}},
+  ]},
+  {st:'КОНКУРЕНЦИЯ',ti:'Завистливый коллега',de:'Сосед из соседнего района строчит жалобы прямо к шефу.',ch:[
+    {t:'Собрать досье на него',e:'связи +3, риск -5%',fn:()=>{G.connections+=3;G.risk=Math.max(0,G.risk-5);addLog('Компромат на коллегу собран.','ok')}},
+    {t:'Помириться, поделиться схемой',e:'+10 млн, риск +8%',fn:()=>{G.wallet+=10;G.risk=Math.min(95,G.risk+8)}},
+    {t:'Пожаловаться в ответ',e:'рейтинг -8, риск -8%',fn:()=>{G.rating=Math.max(0,G.rating-8);G.risk=Math.max(0,G.risk-8)}},
+  ]},
+  {st:'ПРАЗДНИК',ti:'День города — пора пилить',de:'Праздничный бюджет "на культуру". Фейерверки, сцена, и ваш карман.',ch:[
+    {t:'Взять 40% от культурного бюджета',e:'+20 млн, народ +5, риск +10%',fn:()=>{G.wallet+=20;G.pop=Math.min(100,G.pop+5);G.risk=Math.min(95,G.risk+10)}},
+    {t:'Сделать праздник честно',e:'народ +30, рейтинг +12',fn:()=>{G.pop=Math.min(100,G.pop+30);G.rating=Math.min(100,G.rating+12)}},
+    {t:'Отменить из-за "экономии"',e:'народ -15, +3 млн возврат',fn:()=>{G.pop=Math.max(0,G.pop-15);G.wallet+=3}},
+  ]},
+  {st:'ТЕХНОЛОГИИ',ti:'Приказ: цифровизация за месяц',de:'Сверху пришло: весь документооборот перевести на новую ГосПлатформу™.',ch:[
+    {t:'Нанять IT-контору племянника',e:'+20% бюджет, риск +15%',fn:()=>{G.wallet+=G.budgets[G.level]*0.2;G.risk=Math.min(95,G.risk+15);addCrime('Цифровизация через племянника')}},
+    {t:'Купить готовое, переименовать',e:'-5 млн, рейтинг +15',fn:()=>{spend(5,'Чужая система');G.rating=Math.min(100,G.rating+15)}},
+    {t:'Саботировать, ждать следующего приказа',e:'ничего не происходит',fn:()=>{addLog('Цифровизация заморожена. Никто не заметил.','wn')}},
+  ]},
+  {st:'ИНСПЕКЦИЯ',ti:'Москва прислала инспектора',de:'Молодой, дерзкий, незнакомый. Папка документов на вас уже у него в руках.',ch:[
+    {t:'Обед в ресторане + конверт',e:'-8 млн, риск -25%',fn:()=>{spend(8,'Прикормить инспектора');G.risk=Math.max(0,G.risk-25)}},
+    {t:'Показать "образцовый" объект',e:'-4 млн, рейтинг +10, риск -10%',fn:()=>{spend(4,'Показательный объект');G.rating=Math.min(100,G.rating+10);G.risk=Math.max(0,G.risk-10)}},
+    {t:'Найти компромат на него',e:'связи -2, риск -15%',fn:()=>{G.connections=Math.max(0,G.connections-2);G.risk=Math.max(0,G.risk-15);addCrime('Давление на инспектора')}},
+  ]},
+  {st:'СПОРТ',ti:'Местный турнир просит денег',de:'Спортивный комитет просит финансировать турнир. Бюджет там вкусный.',ch:[
+    {t:'Выделить деньги, взять 30%',e:'+15 млн, народ +10, связи +2',fn:()=>{G.wallet+=15;G.pop=Math.min(100,G.pop+10);G.connections+=2}},
+    {t:'Стать почётным президентом',e:'-2 млн, рейтинг +8, народ +5',fn:()=>{spend(2,'Символический взнос');G.rating=Math.min(100,G.rating+8);G.pop=Math.min(100,G.pop+5)}},
+    {t:'Отказать',e:'ничего',fn:()=>{addLog('Спортивный комитет разочарован.','wn')}},
+  ]},
+];
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmt(n){
+  n=Math.round(n);
+  if(n>=1000) return '₽'+Math.round(n/1000)+' млрд';
+  return '₽'+n+' млн';
+}
+
+function spend(amt,reason){
+  if(G.wallet<amt){addLog('Недостаточно средств: '+reason,'dn');return false;}
+  G.wallet-=amt;
+  return true;
+}
+
+function addLog(msg,cls){
+  logT++;
+  const t=String(logT).padStart(2,'0')+':'+String(Math.floor(Math.random()*59)).padStart(2,'0');
+  const el=document.createElement('div');
+  el.className='le'+(cls?' '+cls:'');
+  el.innerHTML='<span class="lets">'+t+'</span><span>'+msg+'</span>';
+  const c=document.getElementById('logc');
+  c.insertBefore(el,c.firstChild);
+  while(c.children.length>7)c.removeChild(c.lastChild);
+}
+
+function addCrime(msg){
+  G.crimeLog.push('КВ.'+G.quarter+'/'+G.year+': '+msg);
+}
+
+function hasContact(id){return G.unlockedContacts.includes(id);}
+
+// ============================================================
+// MOOD & SEASON
+// ============================================================
+const MOODS = [
+  {max:20, label:'💀 Паранойя',   color:'var(--red)'},
+  {max:40, label:'😰 Нервозно',   color:'#c0392b88'},
+  {max:60, label:'😐 Нейтрально', color:'var(--ink3)'},
+  {max:80, label:'😏 Уверенно',   color:'var(--green)'},
+  {max:101,label:'😎 Непотопляем',color:'var(--gold)'},
+];
+
+function updateMood(){
+  let t=50;
+  if(G.risk<20)t+=15; else if(G.risk>60)t-=20;
+  if(G.wallet>100)t+=10;
+  if(G.pop>70)t+=10;
+  if(G.rating>70)t+=10;
+  if(G.pop<20)t-=15;
+  G.mood=Math.max(0,Math.min(100,G.mood+(t-G.mood)*0.3));
+  const m=MOODS.find(x=>G.mood<x.max)||MOODS[4];
+  const el=document.getElementById('mood-val');
+  if(el){el.textContent=m.label;el.style.color=m.color;}
+}
+
+function updateSeason(){
+  const s=SEASONS[G.season%4];
+  const el=document.getElementById('season-name');
+  if(el) el.textContent=s.name;
+}
+
+// ============================================================
+// ACHIEVEMENTS
+// ============================================================
+function showAchToast(a){
+  const wrap=document.getElementById('ach-toast-wrap');
+  const el=document.createElement('div');
+  el.className='ach-toast';
+  el.innerHTML='<span style="color:var(--gold)">★ ДОСТИЖЕНИЕ:</span> '+a.icon+' <strong>'+a.name+'</strong><div style="font-size:9px;color:var(--ink3);margin-top:2px">'+a.desc+'</div>';
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(),3300);
+}
+
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!a.done&&a.check()){
+      a.done=true;
+      showAchToast(a);
+      addLog('★ Достижение: '+a.name,'ok');
+    }
+  });
+  const el=document.getElementById('ach-count');
+  if(el) el.textContent=ACHIEVEMENTS.filter(a=>a.done).length;
+}
+
+// ============================================================
+// PASSIVE BONUSES (was empty in original — now actually works)
+// ============================================================
+function applyPassives(){
+  let riskP=0, popP=0;
+  ASSETS.forEach(a=>{
+    if(G.assets.includes(a.id)&&a.passive){
+      if(a.passive.risk) riskP+=a.passive.risk;
+      if(a.passive.popPerQ) popP+=a.passive.popPerQ;
+    }
+  });
+  // Season mod
+  const s=SEASONS[G.season%4];
+  riskP+=s.riskMod;
+  popP+=s.popMod;
+  // Oligarch passive income
+  if(hasContact('oligarch')&&G.quartersSurvived>0&&G.quartersSurvived%3===0){
+    G.wallet+=15;addLog('Доход от Виктора К.: +15 млн','ok');
+  }
+  if(riskP!==0) G.risk=Math.max(0,Math.min(95,G.risk+riskP));
+  if(popP!==0)  G.pop=Math.max(0,Math.min(100,G.pop+popP));
+  // Pop talent: priest slows pop loss — handled in approveProject
+}
+
+// ============================================================
+// UI UPDATE
+// ============================================================
+function updCalc(){
+  const kb=parseInt(document.getElementById('sl-kb').value);
+  const soc=parseInt(document.getElementById('sl-soc').value);
+  document.getElementById('vkb').textContent=kb+'%';
+  document.getElementById('vsoc').textContent=soc+'%';
+  let budget=G.budgets[G.level];
+  if(G.activePerks.includes('budget_boost')) budget=Math.round(budget*1.2);
+  let take=Math.round(budget*kb/100);
+  if(hasContact('banker')) take=Math.round(take*1.1);
+  let riskAdd=Math.max(0,kb-10-soc);
+  if(G.activePerks.includes('risk_reduce')) riskAdd=Math.round(riskAdd*0.7);
+  if(G.assets.includes('krysha')) riskAdd=Math.round(riskAdd*0.6);
+  const popDelta=soc>=20?5:soc>=10?0:-8;
+  document.getElementById('takehome').textContent=fmt(take);
+  document.getElementById('riskwarn').textContent='+'+riskAdd+'% риск · народ '+(popDelta>=0?'+':'')+popDelta;
+}
+
+function updUI(){
+  document.getElementById('s-wallet').textContent=fmt(G.wallet);
+  document.getElementById('b-wallet').style.width=Math.min(100,G.wallet/5)+'%';
+  document.getElementById('s-risk').textContent=Math.round(G.risk)+'%';
+  document.getElementById('b-risk').style.width=G.risk+'%';
+  document.getElementById('s-rate').textContent=Math.round(G.rating)+'%';
+  document.getElementById('b-rate').style.width=G.rating+'%';
+  document.getElementById('s-pop').textContent=Math.round(G.pop)+'%';
+  document.getElementById('b-pop').style.width=G.pop+'%';
+  document.getElementById('s-conn').textContent=G.connections;
+  document.getElementById('b-conn').style.width=Math.min(100,G.connections*5)+'%';
+  document.getElementById('s-lvl').textContent=G.levels[G.level];
+  document.getElementById('s-xp').textContent='XP: '+G.xp+'/'+G.xpNeeds[G.level];
+  document.getElementById('lvln').textContent=G.levelNames[G.level];
+  document.getElementById('qb').textContent='КВ.'+G.quarter+' / '+G.year;
+  let budget=G.budgets[G.level];
+  if(G.activePerks.includes('budget_boost')) budget=Math.round(budget*1.2);
+  document.getElementById('budgetdisp').textContent=fmt(budget);
+  document.getElementById('budgetnm').textContent=G.budgetNames[G.level];
+  updCalc();
+}
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+function renderContractors(){
+  const list=document.getElementById('clist');
+  list.innerHTML='';
+  CONTRACTORS.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='cbtn'+(selC===i?' sel':'');
+    b.innerHTML='<div><div class="cname">'+c.name+'</div><div class="cinfo">'+c.sub+'</div></div><div class="crisk">+'+c.risk+'%риск</div>';
+    b.onclick=()=>{selC=i;renderContractors();document.getElementById('qhint').textContent='Качество '+c.qual+'% · '+c.name};
+    list.appendChild(b);
+  });
+}
+
+function renderDefense(){
+  function makeList(id,items){
+    const el=document.getElementById(id);
+    el.innerHTML='';
+    items.forEach(d=>{
+      let cost=d.cost;
+      if(hasContact('notary')) cost=Math.round(cost*0.75);
+      const canAff=G.wallet>=cost;
+      const b=document.createElement('button');
+      b.className='defbtn';
+      if(!canAff)b.style.opacity='0.4';
+      b.innerHTML='<span style="font-size:11px">'+d.name+'</span><span class="defcost">-'+cost+'млн · '+d.eff+'</span>';
+      b.onclick=()=>{
+        if(!canAff){addLog('Недостаточно средств','dn');return;}
+        G.wallet-=cost;
+        d.fn();
+        addLog(d.name+': '+d.eff,'ok');
+        updUI();renderDefense();
+      };
+      el.appendChild(b);
+    });
+  }
+  makeList('def-fsb-list',DEFENSE_FSB);
+  makeList('def-pop-list',DEFENSE_POP);
+  makeList('def-boss-list',DEFENSE_BOSS);
+}
+
+function renderShop(){
+  const g=document.getElementById('shopgrid');
+  g.innerHTML='';
+  ASSETS.forEach(a=>{
+    const owned=G.assets.includes(a.id);
+    const canAff=G.wallet>=a.price&&!owned;
+    const b=document.createElement('button');
+    b.className='shopitem'+(owned?' owned':!canAff?' cantaff':'');
+    b.innerHTML='<div style="font-family:\'Russo One\',sans-serif;font-size:13px;color:'+(owned?'var(--green)':'var(--blue)')+'">'+a.icon+'</div>'
+      +'<div class="shn">'+a.name+'</div>'
+      +'<div class="shp">'+(owned?'—':fmt(a.price))+'</div>'
+      +'<div class="shb">'+a.bonus+'</div>'
+      +(owned?'<div class="owned-badge">ОФОРМЛЕНО</div>':'');
+    if(!owned&&canAff){
+      b.onclick=()=>{
+        if(!spend(a.price,a.name))return;
+        G.assets.push(a.id);
+        a.eff();
+        addLog('Приобретено: '+a.name,'ok');
+        applyPassives();
+        updUI();renderShop();
+        checkAchievements();
+      };
+    }
+    g.appendChild(b);
+  });
+}
+
+function renderPerks(){
+  const g=document.getElementById('perkgrid');
+  g.innerHTML='';
+  PERKS.forEach(p=>{
+    const owned=G.activePerks.includes(p.tag);
+    const canUnlock=G.level>=p.lvlReq&&G.xp>=p.cost&&!owned;
+    const b=document.createElement('div');
+    b.style.cssText='background:white;border:1px solid var(--paper3);border-radius:3px;padding:10px;'
+      +(owned?'border-color:var(--green);background:rgba(26,122,58,0.04)':'')
+      +(G.level<p.lvlReq?'opacity:0.35':'');
+    b.innerHTML='<div style="font-size:12px;font-weight:700;color:'+(owned?'var(--green)':'var(--ink)')+'">'+p.name+'</div>'
+      +'<div style="font-size:10px;color:var(--ink3);margin:3px 0 6px">'+p.desc+'</div>'
+      +'<div style="font-size:9px;font-family:\'PT Mono\',monospace;color:var(--ink3)">Ур.'+(p.lvlReq+1)+' · Цена: '+p.cost+' XP</div>'
+      +(owned?'<div style="font-size:9px;color:var(--green);font-family:\'PT Mono\',monospace;margin-top:4px">✓ АКТИВНО</div>'
+        :G.level<p.lvlReq?'<div style="font-size:9px;color:var(--ink3);font-family:\'PT Mono\',monospace;margin-top:4px">Закрыто</div>'
+        :canUnlock?'<button onclick="buyPerk(\''+p.id+'\')" style="margin-top:5px;background:var(--blue);color:white;border:none;border-radius:2px;padding:4px 10px;font-family:\'PT Mono\',monospace;font-size:9px;cursor:pointer;text-transform:uppercase;width:100%">Открыть ('+p.cost+' XP)</button>'
+        :'<div style="font-size:9px;color:var(--ink3);font-family:\'PT Mono\',monospace;margin-top:4px">Мало XP</div>');
+    g.appendChild(b);
+  });
+}
+
+function renderContacts(){
+  const g=document.getElementById('contact-grid');
+  if(!g)return;
+  g.innerHTML='';
+  CONTACTS.forEach(c=>{
+    const owned=G.unlockedContacts.includes(c.id);
+    const canBuy=!owned&&G.connections>=c.connCost&&G.wallet>=c.cost;
+    const d=document.createElement('div');
+    d.className='contact-card'+(owned?' owned':'');
+    if(!owned&&!canBuy) d.style.opacity='0.5';
+    d.innerHTML='<div style="font-size:20px;margin-bottom:4px">'+c.icon+'</div>'
+      +'<div style="font-size:11px;font-weight:700;color:'+(owned?'var(--teal)':'var(--ink)')+'">'+c.name+'</div>'
+      +'<div style="font-size:9px;color:var(--ink3);margin:3px 0 5px;font-style:italic">'+c.desc+'</div>'
+      +'<div style="font-size:9px;font-family:\'PT Mono\',monospace;color:var(--green);margin-bottom:6px">'+c.bonus+'</div>'
+      +(owned
+        ?'<div style="font-size:9px;color:var(--teal);font-family:\'PT Mono\',monospace;font-weight:700">✓ ЗАВЕРБОВАН</div>'
+        :'<div style="font-size:9px;font-family:\'PT Mono\',monospace;color:var(--ink3);margin-bottom:5px">'+c.cost+' млн · '+c.connCost+' связей</div>'
+         +(canBuy?'<button onclick="buyContact(\''+c.id+'\')" style="background:var(--teal);color:white;border:none;border-radius:2px;padding:4px 10px;font-family:\'PT Mono\',monospace;font-size:9px;cursor:pointer;text-transform:uppercase;width:100%">Завербовать</button>'
+           :'<div style="font-size:9px;color:var(--ink3);font-family:\'PT Mono\',monospace">Недостаточно ресурсов</div>'));
+    g.appendChild(d);
+  });
+}
+
+function renderDossier(){
+  const ds=document.getElementById('dossier-stats');
+  if(!ds)return;
+  const rows=[
+    ['Кварталов пережито',G.quartersSurvived],
+    ['Всего в кармане',fmt(G.totalTaken)],
+    ['Связей завербовано',G.unlockedContacts.length],
+    ['Активов куплено',G.assets.length],
+    ['Талантов открыто',G.activePerks.length],
+    ['Комбо кварталов',G.combo>0?G.combo+'🔥':'0'],
+    ['Сезон',SEASONS[G.season%4].name.split('—')[0].trim()],
+  ];
+  ds.innerHTML=rows.map(([k,v])=>'<div class="dstat-row"><span style="color:var(--ink3)">'+k+'</span><span style="color:var(--ink);font-weight:700">'+v+'</span></div>').join('');
+
+  const al=document.getElementById('ach-list');
+  if(al){
+    al.innerHTML=ACHIEVEMENTS.map(a=>'<div style="display:flex;gap:6px;align-items:flex-start;padding:3px 0;border-bottom:1px dotted var(--paper3);opacity:'+(a.done?1:0.35)+'"><span style="font-size:14px">'+a.icon+'</span><div><div style="font-size:10px;font-weight:700;color:'+(a.done?'var(--gold)':'var(--ink3)')+'">'+a.name+'</div><div style="font-size:8px;font-family:\'PT Mono\',monospace;color:var(--ink3)">'+a.desc+'</div></div></div>').join('');
+  }
+
+  const cl=document.getElementById('crime-log');
+  if(cl){
+    cl.innerHTML=G.crimeLog.length===0
+      ?'Пока чист. Пока.'
+      :G.crimeLog.map(e=>'<div style="padding:2px 0;border-bottom:1px dotted var(--paper3)">'+e+'</div>').join('');
+  }
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function buyPerk(id){
+  const p=PERKS.find(x=>x.id===id);
+  if(!p||G.xp<p.cost||G.activePerks.includes(p.tag))return;
+  G.xp-=p.cost;
+  G.activePerks.push(p.tag);
+  if(p.tag==='max_kickback') document.getElementById('sl-kb').max=90;
+  addLog('Талант открыт: '+p.name,'ok');
+  checkAchievements();
+  updUI();renderPerks();
+}
+
+function buyContact(id){
+  const c=CONTACTS.find(x=>x.id===id);
+  if(!c||G.unlockedContacts.includes(c.id))return;
+  if(G.connections<c.connCost||G.wallet<c.cost){addLog('Недостаточно ресурсов','dn');return;}
+  G.connections-=c.connCost;
+  G.wallet-=c.cost;
+  G.unlockedContacts.push(c.id);
+  addLog('Завербован: '+c.name,'ok');
+  checkAchievements();
+  updUI();renderContacts();
+}
+
+function approveProject(){
+  if(selC===null){addLog('Выберите подрядчика!','dn');return;}
+  const kb=parseInt(document.getElementById('sl-kb').value);
+  const soc=parseInt(document.getElementById('sl-soc').value);
+  let budget=G.budgets[G.level];
+  if(G.activePerks.includes('budget_boost')) budget=Math.round(budget*1.2);
+  let take=Math.round(budget*kb/100);
+  if(hasContact('banker')) take=Math.round(take*1.1);
+  if(G.assets.includes('crypto')) take=Math.round(take*1.05);
+  const c=CONTRACTORS[selC];
+  let riskAdd=Math.max(0,kb-10-soc)+c.risk;
+  if(G.activePerks.includes('risk_reduce')) riskAdd=Math.round(riskAdd*0.7);
+  if(G.assets.includes('krysha')) riskAdd=Math.round(riskAdd*0.6);
+  if(hasContact('silovik')) riskAdd=Math.round(riskAdd*0.85);
+
+  let popDelta=soc>=20?8:soc>=10?0:-10;
+  if(hasContact('pop')&&popDelta<0) popDelta=Math.round(popDelta*0.7);
+  const popBoost=G.activePerks.includes('pop_boost')?2:1;
+  const finalPop=soc>=10?popDelta*popBoost:popDelta;
+
+  G.wallet+=take;
+  G.totalTaken+=take;
+  G.risk=Math.min(95,G.risk+riskAdd);
+  G.pop=Math.max(0,Math.min(100,G.pop+finalPop));
+  G.xp+=Math.floor(take/8);
+  G.quartersSurvived++;
+  G.connections=Math.min(99,G.connections+1+G.level);
+
+  if(G.assets.includes('media')) G.pop=Math.min(100,G.pop+5);
+  if(hasContact('journalist')&&soc>0) G.pop=Math.min(100,G.pop+5);
+
+  addLog('Смета подписана. Освоено '+fmt(take)+' через '+c.name+'.','ok');
+  if(riskAdd>15) addLog('ФСБ фиксирует активность.','dn');
+
+  // Track contractor for achievement
+  usedContractors.add(selC);
+
+  importBonus++;
+  if(G.activePerks.includes('import_bonus')&&importBonus%2===0){
+    G.wallet+=20;addLog('Бонус: параллельный импорт +20 млн','ok');
+  }
+
+  if(G.xp>=G.xpNeeds[G.level]&&G.level<3){
+    G.level++;G.xp=0;
+    addLog('ПОВЫШЕНИЕ! Новый уровень: '+G.levels[G.level],'ok');
+  }
+
+  // Season advance every 4 quarters
+  if(G.quartersSurvived%4===0){
+    G.season=(G.season+1)%4;
+    addLog('Смена сезона: '+SEASONS[G.season].name,'wn');
+    updateSeason();
+  }
+
+  // Combo tracking
+  const eventChance=G.activePerks.includes('event_shield')?0.25:0.6;
+  const willEvent=Math.random()<eventChance;
+  if(!willEvent){
+    G.combo++;
+    if(G.combo>1) addLog('Комбо ×'+G.combo+' — тишина 🔥','ok');
+  } else {
+    G.combo=0;
+  }
+  const cl=document.getElementById('combo-lbl');
+  if(cl) cl.textContent=G.combo>1?'×'+G.combo+' комбо':'';
+
+  selC=null;
+  document.getElementById('qhint').textContent='Выберите подрядчика';
+
+  G.quarter++;
+  if(G.quarter>4){G.quarter=1;G.year++;}
+
+  applyPassives();
+  updateMood();
+  checkAchievements();
+
+  updUI();renderContractors();renderShop();renderPerks();
+
+  if(G.risk>=85){setTimeout(()=>endGame('caught'),400);return;}
+  if(G.pop<=5){setTimeout(()=>endGame('revolution'),400);return;}
+  if(G.rating<=5){setTimeout(()=>endGame('fired'),400);return;}
+
+  if(willEvent){
+    const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    setTimeout(()=>showEvent(ev),500);
+  }
+}
+
+function endGame(type){
+  const data={
+    caught:   {st:'УГОЛОВНОЕ ДЕЛО',   ti:'Крайний найден',  de:'ФСБ достигло предела. Дело по ст.290 УК РФ. Вы — крайний. Итого похищено: '+fmt(G.totalTaken)+'. Кварталов у власти: '+G.quartersSurvived+'.'},
+    revolution:{st:'НАРОДНЫЙ БУНТ',   ti:'Вас скинули',     de:'Доверие упало до нуля. Тысячи вышли на площадь. Вертикаль власти сдала вас. Итого нажито: '+fmt(G.wallet)+'. Кварталов: '+G.quartersSurvived+'.'},
+    fired:    {st:'КАДРОВОЕ РЕШЕНИЕ', ti:'Вы уволены',      de:'Рейтинг обнулился. "Освобождён в связи с утратой доверия." Итого нажито: '+fmt(G.totalTaken)+'. Связей было: '+G.unlockedContacts.length+'.'},
+    dubai:    {st:'ЗАСЛУЖЕННАЯ ПЕНСИЯ',ti:'Дубай ждёт',    de:'Освоено '+fmt(G.wallet)+' народных средств. Уходите на покой. Кварталов у власти: '+G.quartersSurvived+'. Апартаменты готовы.'},
+    island:   {st:'ПОЛНАЯ ПОБЕДА',    ti:'Свободен',        de:'Остров. Паспорт Сент-Китса. Никакой экстрадиции. Связей завербовано: '+G.unlockedContacts.length+'. Кварталов у власти: '+G.quartersSurvived+'. Вы выиграли.'},
+  };
+  const d=data[type]||data.caught;
+  showEvent({st:d.st,ti:d.ti,de:d.de,ch:[{t:'Начать заново',e:'Новая игра',fn:resetGame}]});
+}
+
+function resetGame(){
+  G.wallet=0;G.risk=0;G.rating=50;G.pop=50;G.xp=0;
+  G.quarter=1;G.year=2024;G.level=0;
+  G.connections=0;G.combo=0;G.mood=50;G.season=0;
+  G.totalTaken=0;G.quartersSurvived=0;
+  G.assets=[];G.activePerks=[];G.crimeLog=[];G.unlockedContacts=[];
+  selC=null;importBonus=0;
+  usedContractors.clear();
+  ACHIEVEMENTS.forEach(a=>a.done=false);
+  document.getElementById('logc').innerHTML='<div class="le"><span class="lets">--:--</span><span>Новая игра. Добро пожаловать в систему.</span></div>';
+  document.getElementById('ach-count').textContent='0';
+  document.getElementById('combo-lbl').textContent='';
+  document.getElementById('sl-kb').max=70;
+  document.getElementById('sl-kb').value=20;
+  document.getElementById('sl-soc').value=10;
+  updateMood();updateSeason();
+  updUI();renderContractors();renderDefense();renderShop();renderPerks();renderContacts();
+  closeEvent();
+}
+
+// ============================================================
+// BACKGROUND MUSIC
+// ============================================================
+const BG_TRACKS = ['fon1.mp3','fon2.mp3'];
+let bgIdx = 0;
+let bgAudio = new Audio(BG_TRACKS[0]);
+bgAudio.volume = 0.25;
+
+function bgNext(){
+  bgIdx = (bgIdx+1) % BG_TRACKS.length;
+  bgAudio.src = BG_TRACKS[bgIdx];
+  bgAudio.play().catch(()=>{});
+}
+bgAudio.addEventListener('ended', bgNext);
+
+function startBG(){
+  bgAudio.play().catch(()=>{});
+  document.removeEventListener('click', startBG);
+}
+document.addEventListener('click', startBG);
+
+// ============================================================
+// AUDIO
+// ============================================================
+const EVENT_AUDIO = {
+  'КАДРОВЫЕ ИЗМЕНЕНИЯ':  'event_kadry.mp3',
+  'СРОЧНО':              'event_bloger.mp3',
+  'ПОРУЧЕНИЕ СВЕРХУ':    'event_putin.mp3',
+  'ВЫБОРЫ':              'event_vibory.mp3',
+  'ГЕОПОЛИТИКА':         'event_sankcii.mp3',
+  'СИЛОВЫЕ СТРУКТУРЫ':   'event_fsb.mp3',
+  'НАРОДНОЕ НЕДОВОЛЬСТВО':'event_protest.mp3',
+  'ПОВЫШЕНИЕ':           'event_povysh.mp3',
+  'АУДИТ':               'event_audit.mp3',
+  'БИЗНЕС':              'event_biznes.mp3',
+  'ДЕЛЕГАЦИЯ':           'event_delegacia.mp3',
+  'ЧС':                  'event_most.mp3',
+  'КОНКУРЕНЦИЯ':         'event_kolega.mp3',
+  'ПРАЗДНИК':            'event_prazdnik.mp3',
+  'ТЕХНОЛОГИИ':          'event_cifra.mp3',
+  'ИНСПЕКЦИЯ':           'event_inspektor.mp3',
+  'СПОРТ':               'event_sport.mp3',
+  'УГОЛОВНОЕ ДЕЛО':      'end_caught.mp3',
+  'НАРОДНЫЙ БУНТ':       'end_revolution.mp3',
+  'КАДРОВОЕ РЕШЕНИЕ':    'end_fired.mp3',
+  'ЗАСЛУЖЕННАЯ ПЕНСИЯ':  'end_dubai.mp3',
+  'ПОЛНАЯ ПОБЕДА':       'end_island.mp3',
+};
+
+let currentAudio = null;
+
+function playEventAudio(st){
+  if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;}
+  const file = EVENT_AUDIO[st];
+  if(!file) return;
+  currentAudio = new Audio(file);
+  currentAudio.play().catch(()=>{});
+}
+
+function stopEventAudio(){
+  if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;}
+}
+
+function showEvent(ev){
+  document.getElementById('ev-st').textContent=ev.st||'ВХОДЯЩИЙ ДОКУМЕНТ';
+  document.getElementById('ev-ti').textContent=ev.ti||'Событие';
+  document.getElementById('ev-de').textContent=ev.de||'';
+  const ch=document.getElementById('ev-ch');
+  ch.innerHTML='';
+  (ev.ch||[]).forEach(c=>{
+    const b=document.createElement('button');
+    b.className='ech';
+    b.innerHTML='<span>'+c.t+'</span><span class="ceff">'+c.e+'</span>';
+    b.onclick=()=>{c.fn();updUI();renderDefense();renderShop();closeEvent();};
+    ch.appendChild(b);
+  });
+  document.getElementById('eov').classList.add('show');
+  playEventAudio(ev.st);
+}
+
+function closeEvent(){
+  document.getElementById('eov').classList.remove('show');
+  stopEventAudio();
+}
+
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='defense')  renderDefense();
+  if(name==='shop')     renderShop();
+  if(name==='perks')    renderPerks();
+  if(name==='contacts') renderContacts();
+  if(name==='dossier')  renderDossier();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderContractors();
+updUI();
+updateMood();
+updateSeason();
+</script>
